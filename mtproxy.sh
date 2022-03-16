@@ -118,20 +118,21 @@ config_mtp(){
   input_port=443
   input_manage_port=8888
   input_domain="google.com"
+  secret="${3}"
   public_ip=$(curl -s https://api.ip.sb/ip --ipv4)
   [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
   input_tag="${4}"
   default_tag="${4}"
-  echo $input_domain
+  echo $input_tag
   curl -s https://core.telegram.org/getProxySecret -o proxy-secret
   curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
   cat >./mtp_config <<EOF
 #!/bin/bash
-secret="${3}"
-port=${1}
+secret="${secret}"
+port=${input_port}
 web_port=8888
 domain="${input_domain}"
-proxy_tag="${4}"
+proxy_tag="${input_tag}"
 EOF
   echo -e "配置已经生成完毕!"
 }
