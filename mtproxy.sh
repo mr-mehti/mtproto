@@ -182,7 +182,7 @@ config_mtp(){
    # config info
   public_ip=$(curl -s https://api.ip.sb/ip --ipv4)
   [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
-  if [ "$3" == "0" ]
+  if [[ "$3" == "0" ]];
   then
   	secret=$(head -c 16 /dev/urandom | xxd -ps)
   else
