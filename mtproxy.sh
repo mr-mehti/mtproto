@@ -268,6 +268,7 @@ fix_mtp(){
 
 
 param=$1
+echo $1
 if [[ "start" == $param ]];then
   #echo "即将：启动脚本";
   run_mtp
