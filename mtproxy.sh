@@ -108,9 +108,9 @@ install(){
 }
 
 
-print_line(){
+#print_line(){
   #echo -e "========================================="
-}
+#}
 
 
 config_mtp(){
@@ -374,7 +374,7 @@ elif  [[ "fix" == $param ]];then
 else
   if [ ! -f "$WORKDIR/mtp_config" ] && [ ! -f "$WORKDIR/mtproto-proxy" ];then
     #echo "MTProxyTLS一键安装运行绿色脚本"
-    print_line
+    #print_line
     install
     config_mtp
     run_mtp
