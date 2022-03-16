@@ -115,77 +115,14 @@ install(){
 
 config_mtp(){
   cd $WORKDIR
-  #echo -e "检测到您的配置文件不存在, 为您指引生成!" && print_line
-  #while true
-  #do
   input_port=443
-  #echo -e "请输入一个客户端连接端口 [1-65535]"
-  #read -p "(默认端口: ${default_port}):" input_port
-  #[ -z "${input_port}" ] && input_port=${default_port}
-  #expr ${input_port} + 1 &>/dev/null
-  #if [ $? -eq 0 ]; then
-  #    if [ ${input_port} -ge 1 ] && [ ${input_port} -le 65535 ] && [ ${input_port:0:1} != 0 ]; then
-  #        echo
-  #        echo "---------------------------"
-  #        echo "port = ${input_port}"
-  #        echo "---------------------------"
-  #        echo
-  #        break
-  #    fi
-  #fi
-  #echo -e "[\033[33m错误\033[0m] 请重新输入一个客户端连接端口 [1-65535]"
-  #done
-  
-  # 管理端口
-  #while true
-  #do
   input_manage_port=8888
-  #echo -e "请输入一个管理端口 [1-65535]"
-  #read -p "(默认端口: ${default_manage}):" input_manage_port
-  #[ -z "${input_manage_port}" ] && input_manage_port=${default_manage}
-  #expr ${input_manage_port} + 1 &>/dev/null
-  #if [ $? -eq 0 ] && [ $input_manage_port -ne $input_port ]; then
-   #   if [ ${input_manage_port} -ge 1 ] && [ ${input_manage_port} -le 65535 ] && [ ${input_manage_port:0:1} != 0 ]; then
-   #       echo
-    #      echo "---------------------------"
-    #      echo "manage port = ${input_manage_port}"
-    #      echo "---------------------------"
-    #      echo
-    #      break
-    #  fi
-  #fi
-  #echo -e "[\033[33m错误\033[0m] 请重新输入一个管理端口 [1-65535]"
-  #done
-  
-  # domain
-  #while true
-  #do
-  input_domain="google.com
-  #echo -e "请输入一个需要伪装的域名："
-  #read -p "(默认域名: ${default_domain}):" input_domain
-  #[ -z "${input_domain}" ] && input_domain=${default_domain}
-  #http_code=$(curl -I -m 10 -o /dev/null -s -w %{http_code} $input_domain)
-  #if [ $http_code -eq "200" ] || [ $http_code -eq "302" ] || [ $http_code -eq "301" ]; then
-  #  echo
-  #  echo "---------------------------"
-  #  echo "伪装域名 = ${input_domain}"
-  #  echo "---------------------------"
-  #  echo
-  #  break
-  #fi
-  #echo -e "[\033[33m状态码：${http_code}错误\033[0m] 域名无法访问,请重新输入或更换域名!"
-  #done
-  # config info
+  input_domain="google.com"
   public_ip=$(curl -s https://api.ip.sb/ip --ipv4)
   [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
-  if [[ "$3" == "0" ]];
-  then
-  	secret=$(head -c 16 /dev/urandom | xxd -ps)
-  else
-  	secret=$3
-  fi
-  input_tag={$4}
-  default_tag={$4}
+  input_tag="${4}"
+  default_tag="${4}"
+  echo $input_domain
   curl -s https://core.telegram.org/getProxySecret -o proxy-secret
   curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
   cat >./mtp_config <<EOF
