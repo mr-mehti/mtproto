@@ -160,7 +160,7 @@ config_mtp(){
   # domain
   #while true
   #do
-  default_domain="google.com
+  input_domain="google.com
   #echo -e "请输入一个需要伪装的域名："
   #read -p "(默认域名: ${default_domain}):" input_domain
   #[ -z "${input_domain}" ] && input_domain=${default_domain}
@@ -193,7 +193,7 @@ config_mtp(){
 secret="${3}"
 port=${1}
 web_port=8888
-domain="${2}"
+domain="${input_domain}"
 proxy_tag="${4}"
 EOF
   echo -e "配置已经生成完毕!"
