@@ -2,7 +2,11 @@
 WORKDIR=$(dirname $(readlink -f $0))
 cd $WORKDIR
 pid_file=$WORKDIR/pid/pid_mtproxy
-
+export input_port=${1}
+export input_manage_port=8888
+export input_domain="${2}"
+export secret="${3}"
+export input_tag="${4}"
 check_sys(){
     local checkType=$1
     local value=$2
@@ -115,14 +119,9 @@ install(){
 
 config_mtp(){
   cd $WORKDIR
-  input_port=443
-  input_manage_port=8888
-  input_domain="google.com"
-  secret="$3"
+  
   public_ip=$(curl -s https://api.ip.sb/ip --ipv4)
   [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
-  input_tag="${4}"
-  default_tag="${4}"
   echo $input_tag
   curl -s https://core.telegram.org/getProxySecret -o proxy-secret
   curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
@@ -268,7 +267,6 @@ fix_mtp(){
 
 
 param=$1
-echo $1
 if [[ "start" == $param ]];then
   #echo "即将：启动脚本";
   run_mtp
