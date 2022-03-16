@@ -190,29 +190,6 @@ config_mtp(){
   fi
   input_tag=$4
   default_tag=$4
-  # proxy tag
-  <<COMMENT
-	  while true
-	  do
-	  default_tag=""
-	  echo -e "请输入你需要推广的TAG："
-	  echo -e "若没有,请联系 @MTProxybot 进一步创建你的TAG, 可能需要信息如下："
-	  echo -e "IP: ${public_ip}"
-	  echo -e "PORT: ${input_port}"
-	  echo -e "SECRET(可以随便填): ${secret}"
-	  read -p "(留空则跳过):" input_tag
-	  [ -z "${input_tag}" ] && input_tag=${default_tag}
-	  if [ -z "$input_tag" ] || [[ "$input_tag" =~ ^[A-Za-z0-9]{32}$ ]]; then
-	    echo
-	    echo "---------------------------"
-	    echo "PROXY TAG = ${input_tag}"
-	    echo "---------------------------"
-	    echo
-	    break
-	  fi
-	  echo -e "[\033[33m错误\033[0m] TAG格式不正确!"
-	  done
-  COMMENT
   curl -s https://core.telegram.org/getProxySecret -o proxy-secret
   curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
   cat >./mtp_config <<EOF
