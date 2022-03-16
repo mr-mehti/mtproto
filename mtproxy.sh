@@ -109,100 +109,110 @@ install(){
 
 
 print_line(){
-  echo -e "========================================="
+  #echo -e "========================================="
 }
 
 
 config_mtp(){
   cd $WORKDIR
-  echo -e "检测到您的配置文件不存在, 为您指引生成!" && print_line
-  while true
-  do
-  default_port=443
-  echo -e "请输入一个客户端连接端口 [1-65535]"
-  read -p "(默认端口: ${default_port}):" input_port
-  [ -z "${input_port}" ] && input_port=${default_port}
-  expr ${input_port} + 1 &>/dev/null
-  if [ $? -eq 0 ]; then
-      if [ ${input_port} -ge 1 ] && [ ${input_port} -le 65535 ] && [ ${input_port:0:1} != 0 ]; then
-          echo
-          echo "---------------------------"
-          echo "port = ${input_port}"
-          echo "---------------------------"
-          echo
-          break
-      fi
-  fi
-  echo -e "[\033[33m错误\033[0m] 请重新输入一个客户端连接端口 [1-65535]"
-  done
-
+  #echo -e "检测到您的配置文件不存在, 为您指引生成!" && print_line
+  #while true
+  #do
+  default_port=$1
+  input_port=$1
+  #echo -e "请输入一个客户端连接端口 [1-65535]"
+  #read -p "(默认端口: ${default_port}):" input_port
+  #[ -z "${input_port}" ] && input_port=${default_port}
+  #expr ${input_port} + 1 &>/dev/null
+  #if [ $? -eq 0 ]; then
+  #    if [ ${input_port} -ge 1 ] && [ ${input_port} -le 65535 ] && [ ${input_port:0:1} != 0 ]; then
+  #        echo
+  #        echo "---------------------------"
+  #        echo "port = ${input_port}"
+  #        echo "---------------------------"
+  #        echo
+  #        break
+  #    fi
+  #fi
+  #echo -e "[\033[33m错误\033[0m] 请重新输入一个客户端连接端口 [1-65535]"
+  #done
+  
   # 管理端口
-  while true
-  do
+  #while true
+  #do
   default_manage=8888
-  echo -e "请输入一个管理端口 [1-65535]"
-  read -p "(默认端口: ${default_manage}):" input_manage_port
-  [ -z "${input_manage_port}" ] && input_manage_port=${default_manage}
-  expr ${input_manage_port} + 1 &>/dev/null
-  if [ $? -eq 0 ] && [ $input_manage_port -ne $input_port ]; then
-      if [ ${input_manage_port} -ge 1 ] && [ ${input_manage_port} -le 65535 ] && [ ${input_manage_port:0:1} != 0 ]; then
-          echo
-          echo "---------------------------"
-          echo "manage port = ${input_manage_port}"
-          echo "---------------------------"
-          echo
-          break
-      fi
-  fi
-  echo -e "[\033[33m错误\033[0m] 请重新输入一个管理端口 [1-65535]"
-  done
-
+  input_manage_port=8888
+  #echo -e "请输入一个管理端口 [1-65535]"
+  #read -p "(默认端口: ${default_manage}):" input_manage_port
+  #[ -z "${input_manage_port}" ] && input_manage_port=${default_manage}
+  #expr ${input_manage_port} + 1 &>/dev/null
+  #if [ $? -eq 0 ] && [ $input_manage_port -ne $input_port ]; then
+   #   if [ ${input_manage_port} -ge 1 ] && [ ${input_manage_port} -le 65535 ] && [ ${input_manage_port:0:1} != 0 ]; then
+   #       echo
+    #      echo "---------------------------"
+    #      echo "manage port = ${input_manage_port}"
+    #      echo "---------------------------"
+    #      echo
+    #      break
+    #  fi
+  #fi
+  #echo -e "[\033[33m错误\033[0m] 请重新输入一个管理端口 [1-65535]"
+  #done
+  
   # domain
-  while true
-  do
-  default_domain="azure.microsoft.com"
-  echo -e "请输入一个需要伪装的域名："
-  read -p "(默认域名: ${default_domain}):" input_domain
-  [ -z "${input_domain}" ] && input_domain=${default_domain}
-  http_code=$(curl -I -m 10 -o /dev/null -s -w %{http_code} $input_domain)
-  if [ $http_code -eq "200" ] || [ $http_code -eq "302" ] || [ $http_code -eq "301" ]; then
-    echo
-    echo "---------------------------"
-    echo "伪装域名 = ${input_domain}"
-    echo "---------------------------"
-    echo
-    break
-  fi
-  echo -e "[\033[33m状态码：${http_code}错误\033[0m] 域名无法访问,请重新输入或更换域名!"
-  done
+  #while true
+  #do
+  default_domain=$2
+  default_domain=$2
+  #echo -e "请输入一个需要伪装的域名："
+  #read -p "(默认域名: ${default_domain}):" input_domain
+  #[ -z "${input_domain}" ] && input_domain=${default_domain}
+  #http_code=$(curl -I -m 10 -o /dev/null -s -w %{http_code} $input_domain)
+  #if [ $http_code -eq "200" ] || [ $http_code -eq "302" ] || [ $http_code -eq "301" ]; then
+  #  echo
+  #  echo "---------------------------"
+  #  echo "伪装域名 = ${input_domain}"
+  #  echo "---------------------------"
+  #  echo
+  #  break
+  #fi
+  #echo -e "[\033[33m状态码：${http_code}错误\033[0m] 域名无法访问,请重新输入或更换域名!"
+  #done
   
    # config info
   public_ip=$(curl -s https://api.ip.sb/ip --ipv4)
   [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
-  secret=$(head -c 16 /dev/urandom | xxd -ps)
-
-  # proxy tag
-  while true
-  do
-  default_tag=""
-  echo -e "请输入你需要推广的TAG："
-  echo -e "若没有,请联系 @MTProxybot 进一步创建你的TAG, 可能需要信息如下："
-  echo -e "IP: ${public_ip}"
-  echo -e "PORT: ${input_port}"
-  echo -e "SECRET(可以随便填): ${secret}"
-  read -p "(留空则跳过):" input_tag
-  [ -z "${input_tag}" ] && input_tag=${default_tag}
-  if [ -z "$input_tag" ] || [[ "$input_tag" =~ ^[A-Za-z0-9]{32}$ ]]; then
-    echo
-    echo "---------------------------"
-    echo "PROXY TAG = ${input_tag}"
-    echo "---------------------------"
-    echo
-    break
+  if [ $3 == 0 ]
+  then
+  	secret=$(head -c 16 /dev/urandom | xxd -ps)
+  else
+  	secret=$3
   fi
-  echo -e "[\033[33m错误\033[0m] TAG格式不正确!"
-  done
-
+  input_tag=$4
+  default_tag=$4
+  # proxy tag
+  <<COMMENT
+	  while true
+	  do
+	  default_tag=""
+	  echo -e "请输入你需要推广的TAG："
+	  echo -e "若没有,请联系 @MTProxybot 进一步创建你的TAG, 可能需要信息如下："
+	  echo -e "IP: ${public_ip}"
+	  echo -e "PORT: ${input_port}"
+	  echo -e "SECRET(可以随便填): ${secret}"
+	  read -p "(留空则跳过):" input_tag
+	  [ -z "${input_tag}" ] && input_tag=${default_tag}
+	  if [ -z "$input_tag" ] || [[ "$input_tag" =~ ^[A-Za-z0-9]{32}$ ]]; then
+	    echo
+	    echo "---------------------------"
+	    echo "PROXY TAG = ${input_tag}"
+	    echo "---------------------------"
+	    echo
+	    break
+	  fi
+	  echo -e "[\033[33m错误\033[0m] TAG格式不正确!"
+	  done
+  COMMENT
   curl -s https://core.telegram.org/getProxySecret -o proxy-secret
   curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
   cat >./mtp_config <<EOF
@@ -213,7 +223,7 @@ web_port=${input_manage_port}
 domain="${input_domain}"
 proxy_tag="${input_tag}"
 EOF
-  echo -e "配置已经生成完毕!"
+  #echo -e "配置已经生成完毕!"
 }
 
 status_mtp(){
@@ -234,14 +244,14 @@ info_mtp(){
     [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
     domain_hex=$(xxd -pu <<< $domain | sed 's/0a//g')
     client_secret="ee${secret}${domain_hex}"
-    echo -e "TMProxy+TLS代理: \033[32m运行中\033[0m"
-    echo -e "服务器IP：\033[31m$public_ip\033[0m"
-    echo -e "服务器端口：\033[31m$port\033[0m"
-    echo -e "MTProxy Secret:  \033[31m$client_secret\033[0m"
-    echo -e "TG一键链接: https://t.me/proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
-    echo -e "TG一键链接: tg://proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
+    #echo -e "TMProxy+TLS代理: \033[32m运行中\033[0m"
+    #echo -e "服务器IP：\033[31m$public_ip\033[0m"
+    #echo -e "服务器端口：\033[31m$port\033[0m"
+    #echo -e "MTProxy Secret:  \033[31m$client_secret\033[0m"
+    echo -e "https://t.me/proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
+    #echo -e "tg://proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
   else
-    echo -e "TMProxy+TLS代理: \033[33m已停止\033[0m"
+    echo -e "ERORR"
   fi
 }
 
@@ -250,7 +260,7 @@ run_mtp(){
   cd $WORKDIR
   status_mtp
   if [ $? == 1 ];then
-    echo -e "提醒：\033[33mMTProxy已经运行，请勿重复运行!\033[0m"
+    cd $WORKDIR
   else
     curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
     source ./mtp_config
@@ -283,8 +293,8 @@ debug_mtp(){
   fi
   tag_arg=""
   [[ -n "$proxy_tag" ]] && tag_arg="-P $proxy_tag"
-  echo "当前正在运行调试模式："
-  echo -e "\t你随时可以通过 Ctrl+C 进行取消操作"
+  #echo "当前正在运行调试模式："
+  #echo -e "\t你随时可以通过 Ctrl+C 进行取消操作"
   echo " ./mtproto-proxy -u nobody -p $web_port -H $port -S $secret --aes-pwd proxy-secret proxy-multi.conf -M 1 $tag_arg --domain $domain $nat_info"
   ./mtproto-proxy -u nobody -p $web_port -H $port -S $secret --aes-pwd proxy-secret proxy-multi.conf -M 1 $tag_arg --domain $domain $nat_info
 }
@@ -304,9 +314,9 @@ fix_mtp(){
     echo -e "> ※ (该功能仅限 root 用户执行)"
   fi	
 
-  print_line
-  echo -e "> 开始清空防火墙规则/停止防火墙/卸载防火墙..."
-  print_line
+  #print_line
+  #echo -e "> 开始清空防火墙规则/停止防火墙/卸载防火墙..."
+  #print_line
 
   if check_sys packageManager yum; then
     systemctl stop firewalld.service
@@ -326,9 +336,9 @@ fix_mtp(){
     ufw disable
   fi
   
-  print_line
-  echo -e "> 开始安装/更新iproute2..."
-  print_line
+  #print_line
+  #echo -e "> 开始安装/更新iproute2..."
+  #print_line
   
   if check_sys packageManager yum; then
     yum install -y epel-release
@@ -340,21 +350,21 @@ fix_mtp(){
 	apt-get install -y iproute2
   fi
   
-  echo -e "< 处理完毕，如有报错忽略即可..."
-  echo -e "< 如遇到端口冲突，请自行关闭相关程序"
+  #echo -e "< 处理完毕，如有报错忽略即可..."
+  #echo -e "< 如遇到端口冲突，请自行关闭相关程序"
 }
 
 
 
 param=$1
 if [[ "start" == $param ]];then
-  echo "即将：启动脚本";
+  #echo "即将：启动脚本";
   run_mtp
 elif  [[ "stop" == $param ]];then
-  echo "即将：停止脚本";
+  #echo "即将：停止脚本";
   stop_mtp;
 elif  [[ "debug" == $param ]];then
-  echo "即将：调试运行";
+  #echo "即将：调试运行";
   debug_mtp;
 elif  [[ "restart" == $param ]];then
   stop_mtp
@@ -363,25 +373,25 @@ elif  [[ "fix" == $param ]];then
   fix_mtp
 else
   if [ ! -f "$WORKDIR/mtp_config" ] && [ ! -f "$WORKDIR/mtproto-proxy" ];then
-    echo "MTProxyTLS一键安装运行绿色脚本"
+    #echo "MTProxyTLS一键安装运行绿色脚本"
     print_line
     install
     config_mtp
     run_mtp
   else
     [ ! -f "$WORKDIR/mtp_config" ] && config_mtp
-    echo "MTProxyTLS一键安装运行绿色脚本"
-    print_line
-    info_mtp
-    print_line
-    echo -e "脚本源码：https://github.com/ellermister/mtproxy"
-    echo -e "配置文件: $WORKDIR/mtp_config"
-    echo -e "卸载方式：直接删除当前目录下文件即可"
-    echo "使用方式:"
-    echo -e "\t启动服务 bash $0 start"
-    echo -e "\t调试运行 bash $0 debug"
-    echo -e "\t停止服务 bash $0 stop"
-    echo -e "\t重启服务 bash $0 restart"
-    echo -e "\t修复常见问题 bash $0 fix"
+    #echo "MTProxyTLS一键安装运行绿色脚本"
+    #print_line
+    #info_mtp
+    #print_line
+    #echo -e "脚本源码：https://github.com/ellermister/mtproxy"
+    #echo -e "配置文件: $WORKDIR/mtp_config"
+    #echo -e "卸载方式：直接删除当前目录下文件即可"
+    #echo "使用方式:"
+    #echo -e "\t启动服务 bash $0 start"
+    #echo -e "\t调试运行 bash $0 debug"
+    #echo -e "\t停止服务 bash $0 stop"
+    #echo -e "\t重启服务 bash $0 restart"
+    #echo -e "\t修复常见问题 bash $0 fix"
   fi
 fi
