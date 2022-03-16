@@ -118,8 +118,7 @@ config_mtp(){
   #echo -e "检测到您的配置文件不存在, 为您指引生成!" && print_line
   #while true
   #do
-  default_port=$1
-  input_port=$1
+  input_port=443
   #echo -e "请输入一个客户端连接端口 [1-65535]"
   #read -p "(默认端口: ${default_port}):" input_port
   #[ -z "${input_port}" ] && input_port=${default_port}
@@ -140,7 +139,6 @@ config_mtp(){
   # 管理端口
   #while true
   #do
-  default_manage=8888
   input_manage_port=8888
   #echo -e "请输入一个管理端口 [1-65535]"
   #read -p "(默认端口: ${default_manage}):" input_manage_port
@@ -162,8 +160,7 @@ config_mtp(){
   # domain
   #while true
   #do
-  default_domain=$2
-  default_domain=$2
+  default_domain="google.com
   #echo -e "请输入一个需要伪装的域名："
   #read -p "(默认域名: ${default_domain}):" input_domain
   #[ -z "${input_domain}" ] && input_domain=${default_domain}
@@ -178,8 +175,7 @@ config_mtp(){
   #fi
   #echo -e "[\033[33m状态码：${http_code}错误\033[0m] 域名无法访问,请重新输入或更换域名!"
   #done
-  
-   # config info
+  # config info
   public_ip=$(curl -s https://api.ip.sb/ip --ipv4)
   [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
   if [[ "$3" == "0" ]];
@@ -188,8 +184,8 @@ config_mtp(){
   else
   	secret=$3
   fi
-  input_tag=$4
-  default_tag=$4
+  input_tag={$4}
+  default_tag={$4}
   curl -s https://core.telegram.org/getProxySecret -o proxy-secret
   curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
   cat >./mtp_config <<EOF
@@ -198,7 +194,7 @@ secret="${3}"
 port=${1}
 web_port=8888
 domain="${2}"
-proxy_tag="4"
+proxy_tag="${4}"
 EOF
   echo -e "配置已经生成完毕!"
 }
