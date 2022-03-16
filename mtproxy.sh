@@ -118,7 +118,7 @@ config_mtp(){
   input_port=443
   input_manage_port=8888
   input_domain="google.com"
-  secret="${3}"
+  secret="$3"
   public_ip=$(curl -s https://api.ip.sb/ip --ipv4)
   [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
   input_tag="${4}"
