@@ -194,13 +194,14 @@ config_mtp(){
   curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
   cat >./mtp_config <<EOF
 #!/bin/bash
+echo ${secret}
 secret="${secret}"
 port=${input_port}
 web_port=${input_manage_port}
 domain="${input_domain}"
 proxy_tag="${input_tag}"
 EOF
-  #echo -e "配置已经生成完毕!"
+  echo -e "配置已经生成完毕!"
 }
 
 status_mtp(){
