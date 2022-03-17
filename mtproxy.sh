@@ -2,11 +2,11 @@
 WORKDIR=$(dirname $(readlink -f $0))
 cd $WORKDIR
 pid_file=$WORKDIR/pid/pid_mtproxy
-export input_port=${1}
-export input_manage_port=8888
-export input_domain="${2}"
-export secret="${3}"
-export input_tag="${4}"
+input_port=${1}
+secret="${2}"
+input_domain="${3}"
+input_tag="${4}"
+input_manage_port=8443
 check_sys(){
     local checkType=$1
     local value=$2
@@ -112,24 +112,24 @@ install(){
 }
 
 
-#print_line(){
-  #echo -e "========================================="
-#}
+print_line(){
+  echo -e "========================================="
+}
 
 
 config_mtp(){
   cd $WORKDIR
-  
+   # config info
   public_ip=$(curl -s https://api.ip.sb/ip --ipv4)
   [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
-  echo $input_tag
+  #secret=$(head -c 16 /dev/urandom | xxd -ps)
   curl -s https://core.telegram.org/getProxySecret -o proxy-secret
   curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
   cat >./mtp_config <<EOF
 #!/bin/bash
 secret="${secret}"
 port=${input_port}
-web_port=8888
+web_port=${input_manage_port}
 domain="${input_domain}"
 proxy_tag="${input_tag}"
 EOF
@@ -154,14 +154,9 @@ info_mtp(){
     [ -z "$public_ip" ] && public_ip=$(curl -s ipinfo.io/ip --ipv4)
     domain_hex=$(xxd -pu <<< $domain | sed 's/0a//g')
     client_secret="ee${secret}${domain_hex}"
-    #echo -e "TMProxy+TLS代理: \033[32m运行中\033[0m"
-    #echo -e "服务器IP：\033[31m$public_ip\033[0m"
-    #echo -e "服务器端口：\033[31m$port\033[0m"
-    #echo -e "MTProxy Secret:  \033[31m$client_secret\033[0m"
     echo -e "https://t.me/proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
-    #echo -e "tg://proxy?server=${public_ip}&port=${port}&secret=${client_secret}"
   else
-    echo -e "ERORR"
+    echo -e "Error."
   fi
 }
 
@@ -170,7 +165,7 @@ run_mtp(){
   cd $WORKDIR
   status_mtp
   if [ $? == 1 ];then
-    cd $WORKDIR
+    echo -e "提醒：\033[33mMTProxy已经运行，请勿重复运行!\033[0m"
   else
     curl -s https://core.telegram.org/getProxyConfig -o proxy-multi.conf
     source ./mtp_config
@@ -203,8 +198,8 @@ debug_mtp(){
   fi
   tag_arg=""
   [[ -n "$proxy_tag" ]] && tag_arg="-P $proxy_tag"
-  #echo "当前正在运行调试模式："
-  #echo -e "\t你随时可以通过 Ctrl+C 进行取消操作"
+  echo "当前正在运行调试模式："
+  echo -e "\t你随时可以通过 Ctrl+C 进行取消操作"
   echo " ./mtproto-proxy -u nobody -p $web_port -H $port -S $secret --aes-pwd proxy-secret proxy-multi.conf -M 1 $tag_arg --domain $domain $nat_info"
   ./mtproto-proxy -u nobody -p $web_port -H $port -S $secret --aes-pwd proxy-secret proxy-multi.conf -M 1 $tag_arg --domain $domain $nat_info
 }
@@ -224,9 +219,9 @@ fix_mtp(){
     echo -e "> ※ (该功能仅限 root 用户执行)"
   fi	
 
-  #print_line
-  #echo -e "> 开始清空防火墙规则/停止防火墙/卸载防火墙..."
-  #print_line
+  print_line
+  echo -e "> 开始清空防火墙规则/停止防火墙/卸载防火墙..."
+  print_line
 
   if check_sys packageManager yum; then
     systemctl stop firewalld.service
@@ -246,9 +241,9 @@ fix_mtp(){
     ufw disable
   fi
   
-  #print_line
-  #echo -e "> 开始安装/更新iproute2..."
-  #print_line
+  print_line
+  echo -e "> 开始安装/更新iproute2..."
+  print_line
   
   if check_sys packageManager yum; then
     yum install -y epel-release
@@ -260,21 +255,21 @@ fix_mtp(){
 	apt-get install -y iproute2
   fi
   
-  #echo -e "< 处理完毕，如有报错忽略即可..."
-  #echo -e "< 如遇到端口冲突，请自行关闭相关程序"
+  echo -e "< 处理完毕，如有报错忽略即可..."
+  echo -e "< 如遇到端口冲突，请自行关闭相关程序"
 }
 
 
 
 param=$1
 if [[ "start" == $param ]];then
-  #echo "即将：启动脚本";
+  echo "即将：启动脚本";
   run_mtp
 elif  [[ "stop" == $param ]];then
-  #echo "即将：停止脚本";
+  echo "即将：停止脚本";
   stop_mtp;
 elif  [[ "debug" == $param ]];then
-  #echo "即将：调试运行";
+  echo "即将：调试运行";
   debug_mtp;
 elif  [[ "restart" == $param ]];then
   stop_mtp
@@ -283,25 +278,23 @@ elif  [[ "fix" == $param ]];then
   fix_mtp
 else
   if [ ! -f "$WORKDIR/mtp_config" ] && [ ! -f "$WORKDIR/mtproto-proxy" ];then
-    #echo "MTProxyTLS一键安装运行绿色脚本"
-    #print_line
     install
     config_mtp
     run_mtp
   else
     [ ! -f "$WORKDIR/mtp_config" ] && config_mtp
-    #echo "MTProxyTLS一键安装运行绿色脚本"
-    #print_line
-    #info_mtp
-    #print_line
-    #echo -e "脚本源码：https://github.com/ellermister/mtproxy"
-    #echo -e "配置文件: $WORKDIR/mtp_config"
-    #echo -e "卸载方式：直接删除当前目录下文件即可"
-    #echo "使用方式:"
-    #echo -e "\t启动服务 bash $0 start"
-    #echo -e "\t调试运行 bash $0 debug"
-    #echo -e "\t停止服务 bash $0 stop"
-    #echo -e "\t重启服务 bash $0 restart"
-    #echo -e "\t修复常见问题 bash $0 fix"
+    echo "MTProxyTLS一键安装运行绿色脚本"
+    print_line
+    info_mtp
+    print_line
+    echo -e "脚本源码：https://github.com/ellermister/mtproxy"
+    echo -e "配置文件: $WORKDIR/mtp_config"
+    echo -e "卸载方式：直接删除当前目录下文件即可"
+    echo "使用方式:"
+    echo -e "\t启动服务 bash $0 start"
+    echo -e "\t调试运行 bash $0 debug"
+    echo -e "\t停止服务 bash $0 stop"
+    echo -e "\t重启服务 bash $0 restart"
+    echo -e "\t修复常见问题 bash $0 fix"
   fi
 fi
